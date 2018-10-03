@@ -176,19 +176,20 @@ class WellAnnotator():
 
     def add_to_y_train(self):
         if self.y_train is None:
-            self.y_train = self.annotated_img
+            self.y_train = np.expand_dims(self.annotated_img, axis = 0)
         else:
-            self.y_train = np.concatenate((self.y_train, self.annotated_img), axis=-1)
+            self.y_train = np.concatenate((self.y_train, np.expand_dims(self.annotated_img, axis = 0)), axis= 0)
         self.annotated_img = np.zeros((500, 500, 1), dtype=np.uint8)
 
     def add_to_x_train(self):
         img = cv2.cvtColor(self.zoomed_img, cv2.COLOR_BGR2GRAY)
         img = skimage.transform.resize(img, (500, 500), anti_aliasing=True)
         img = np.expand_dims(img, axis=-1)
+        img = np.expand_dims(img, axis=0)
         if self.x_train is None:
             self.x_train = img
         else:
-            self.x_train = np.concatenate((self.x_train, img), axis=-1)
+            self.x_train = np.concatenate((self.x_train, img), axis=0)
 
     def back_to_finding_mode(self):
         self.annotating = False
@@ -201,8 +202,8 @@ class WellAnnotator():
         self.accept_message_displayed = False
 
     def show_results(self):
-        cv2.imshow('x', self.x_train[:, :, -1])
-        cv2.imshow('y', self.y_train[:, :, -1])
+        cv2.imshow('x', self.x_train[-1,:, :,0])
+        cv2.imshow('y', self.y_train[-1,:, :,0])
 
     def accept_annotation(self):
         if self.accept_message_displayed:
